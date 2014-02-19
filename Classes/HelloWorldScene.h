@@ -2,12 +2,35 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "Box2D/Box2D.h"
+#include "GLES-Render.h"
+#include "B2DebugDrawLayer.h"
+#include "GameOver.h"
 
 USING_NS_CC;
+
+class BoxContactListener :
+	public b2ContactListener
+{
+public:
+	virtual void BeginContact(b2Contact* contact);
+	virtual void EndContact(b2Contact* contact);
+
+	bool _collided;
+	CCSprite* _plane;
+};
 
 class HelloWorld : public cocos2d::CCLayer
 {
 public:
+	enum EVerticesType
+	{
+		eVerticesPlane,
+		eVerticesGround,
+		eVerticesSpikeUp,
+		eVerticesSpikeDown
+	};
+
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();  
 
@@ -19,10 +42,9 @@ public:
 
 	void gameLogic(float dt);
 	void generateSpike();
-
+	void removeSpikes();
 	void resetGame();
-	bool isColliding();
-	bool isPixelPerfectCollide(CCSprite* sp1, CCSprite* sp2);
+	void addBoxBodyForSprite(CCSprite* sprite, EVerticesType type);
 
     // implement the "static node()" method manually
     CREATE_FUNC(HelloWorld);
@@ -31,18 +53,23 @@ public:
 
 
 private:
-
 	CCTexture2D* _texBackground;
 	CCTexture2D* _texGround;
 	CCTexture2D* _texPlane[4];
 	CCTexture2D *_texSpikeUp, *_texSpikeDown;
-	CCImage *_texMaskPlane, *_texMaskSpikeUp, *_texMaskSpikeDown;
+	CCTexture2D *_texTap[2];
 	int _curPlane;
 
-	CCLabelTTF* _lbl;
+	b2World *_world;
+	BoxContactListener _contactListener;
+
+	CCLabelTTF* _lblScore;
+	CCSprite* _txtGetReady;
 	CCSprite* _background;
 	CCSprite* _ground;
-	CCSprite* _plane, *_plane2;
+	CCSprite* _plane;
+	CCSprite* _instTap;
+	CCAnimate* _planeAnim;
 	std::vector<CCSprite*> _spikes;
 
 	float _pGravity;
@@ -55,8 +82,14 @@ private:
 	float _pBgSpeed;
 	float _pSpeed;
 	int _kNextSpawn;
+	float _travel;
+	unsigned int _hiScore;
 
 	bool _xCrash;
+	bool _xGameOver;
+	bool _xGameInstruct;
+
+	GameOver *_layerGameOver;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
