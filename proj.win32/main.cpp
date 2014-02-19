@@ -15,7 +15,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     // create the application instance
     AppDelegate app;
     CCEGLView* eglView = CCEGLView::sharedOpenGLView();
-    eglView->setViewName("TappyPlane");
+    eglView->setViewName("Tappy Plane");
     eglView->setFrameSize(900, 640);
     return CCApplication::sharedApplication()->run();
 }
